@@ -1,0 +1,35 @@
+{
+  "name": "@dljsbook/components",
+  "version": "0.0.1",
+  "description": "",
+  "repository": "https://github.com/dljsbook/components",
+  "scripts": {
+    "deploy": "gh-pages -d data",
+    "develop": "rollup -c rollup.config.js",
+    "watch": "rollup -c rollup.config.js -w"
+  },
+  "author": "Kevin Scott <kevin@hitheory.com>",
+  "license": "MIT",
+  "jest": {
+    "roots": [
+      "<rootDir>/src"
+    ],
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ]
+  },
+  "dependencies": {
+    "react": "^16.6.1",
+    "styled-components": "^4.0.3"
+  }
+}
+
