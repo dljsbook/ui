@@ -1,0 +1,61 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v4.json",
+  "width": 1000,
+  "height": 600,
+  "vconcat": [{
+    "hconcat": [
+      {
+        "data": {
+          "name": "source1",
+          "values": [{"x": 0, "y": 0}, {"x": 2, "y": 2}]
+        },
+        "mark": "line",
+        "encoding": {
+          "x": {"field": "x"},
+          "y": {"field": "y"},
+          "size": {"value": 2}
+        }
+      },
+      {
+        "data": {
+          "name": "source2",
+          "values": [{"x": 0, "y": 0}, {"x": 3, "y": 3}]
+        },
+        "mark": "point",
+        "encoding": {
+          "x": {"field": "x"},
+          "y": {"field": "y"},
+          "size": {"value": 2}
+        }
+      }
+    ]
+  }, {
+    "hconcat": [
+      {
+        "data": {
+          "name": "source1",
+          "values": [{"x": 0, "y": 0}, {"x": 2, "y": 2}]
+        },
+        "mark": "line",
+        "encoding": {
+          "x": {"field": "x"},
+          "y": {"field": "y"},
+          "size": {"value": 2}
+        }
+      },
+      {
+        "data": {
+          "name": "source2",
+          "values": [{"x": 0, "y": 0}, {"x": 3, "y": 3}]
+        },
+        "mark": "point",
+        "encoding": {
+          "x": {"field": "x"},
+          "y": {"field": "y"},
+          "size": {"value": 2}
+        }
+      }
+    ]
+  }]
+}
+
