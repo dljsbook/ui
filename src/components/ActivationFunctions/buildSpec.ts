@@ -14,7 +14,7 @@ interface IProps {
 }
 
 const DATA_NAME = 'source';
-const Y_NAME = 'y_source';
+// const Y_NAME = 'y_source';
 const X_NAME = 'xpos';
 
 const AXES = [

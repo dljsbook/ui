@@ -3,3 +3,5 @@ dist
 .DS_Store
 yarn-error.log
 package-lock.json
+.rpt2_cache
+build

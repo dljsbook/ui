@@ -1,19 +1,24 @@
-import typescript from 'rollup-plugin-typescript';
-import json from 'rollup-plugin-json';
+import typescript from 'rollup-plugin-typescript2';
 
 export default {
   input: './src/index.ts',
   output: {
     file: 'dist/index.js',
-    format: 'esm',
+    format: 'umd',
+    name: 'dljsbookUI',
+    globals: {
+      vega: 'vega',
+      '@tensorflow/tfjs-vis': 'tfvis',
+      '@tensorflow/tfjs': 'tf',
+    }
   },
   plugins: [
-    typescript(),
-    json({
+    typescript({
     }),
   ],
   external: [
-    'vega-embed',
-    'emotion',
+    '@tensorflow/tfjs',
+    '@tensorflow/tfjs-vis',
+    'vega',
   ],
 }

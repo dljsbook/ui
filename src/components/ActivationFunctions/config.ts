@@ -6,6 +6,7 @@ export const FNS: {
   [index: string]: {
     fn: (x: number) => number;
     expr: (x: string) => string;
+    interpolate?: boolean;
   }
 } = {
   [ACTIVATION_FUNCTION.SIGMOID]: {

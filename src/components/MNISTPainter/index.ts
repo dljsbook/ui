@@ -3,6 +3,9 @@ import { css } from 'emotion';
 import Canvas from 'pixelated-canvas';
 import makeElement from './makeElement';
 
+const PIXELSIZE = 15;
+const PIXELS = 28;
+
 const fonts = `
   font-family: -apple-system,
   BlinkMacSystemFont,
@@ -40,7 +43,7 @@ const predictionClass = css`
 
 const graphContainer = css`
   flex: 1;
-  height: 80%;
+  height: 32px;
 `;
 
 const graphClass = css`
@@ -56,21 +59,42 @@ const graphClass = css`
   overflow: hidden;
 `;
 
+interface IParams {
+  size?: number;
+}
+
 class MNISTPainter {
   private model:tf.Model;
   private canvas: Canvas;
+  private button: HTMLElement;
   private container: HTMLElement;
   private predictions: HTMLElement;
+  // private size: number;
 
-  render(target: HTMLElement) {
+  render(target: HTMLElement, {
+    size,
+  }: IParams = {}) {
+    // this.size = size || 28 * 10;
     this.container = makeElement('div', css`
       display: flex;
       flex-direction: row;
       ${fonts}
     `);
     target.appendChild(this.container);
-    this.canvas = new Canvas();
+    this.canvas = new Canvas({
+      width: PIXELSIZE * PIXELS,
+      height: PIXELSIZE * PIXELS,
+      xPixels: PIXELS,
+      yPixels: PIXELS,
+    });
     this.canvas.render(this.container);
+
+    this.button = makeElement('button');
+    this.button.innerHTML = 'reset';
+    target.appendChild(this.button);
+    this.button.onclick = () => {
+      this.canvas.reset();
+    };
   }
 
   setModel = (model: tf.Model) => {
@@ -97,13 +121,19 @@ class MNISTPainter {
 
   showPredictions = (predictions: number[]) => {
     const preds = Array.prototype.slice.call(predictions).map((pred: number) => `${Math.round(pred * 100)}%`)
-    console.log(preds.join('|'));
+    // console.log(preds.join('|'));
     preds.forEach((pred: string, index: number) => {
-      const div = this.predictions.children[index].children[1].children[0];
+      const div = this.predictions.children[index].children[1].children[0] as HTMLElement;
       div.innerHTML = pred;
       div.style.width = pred;
     });
   }
+
+  getPixels = () => {
+    console.log(this.canvas);
+    const pixels = this.canvas.getPixels();
+    return pixels;
+  };
 
   predict = async () => {
     if (!this.model) {
@@ -112,15 +142,13 @@ class MNISTPainter {
 
     this.renderPredictions();
     while(true) {
-      console.log('go');
       const pixels = this.canvas.getPixels();
       const t = tf.tensor3d(pixels, [28, 28, 1]).expandDims(0);
-      console.log(t.dataSync());
       const p: any = await this.model.predict(t);
       const predictions = p.dataSync();
       this.showPredictions(predictions);
       await tf.nextFrame();
-      await wait(500);
+      await wait(100);
     }
   }
 }
