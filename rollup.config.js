@@ -8,6 +8,7 @@ export default {
     name: 'dljsbookUI',
     globals: {
       vega: 'vega',
+      emotion: 'emotion',
       '@tensorflow/tfjs-vis': 'tfvis',
       '@tensorflow/tfjs': 'tf',
     }

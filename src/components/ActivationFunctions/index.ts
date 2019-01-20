@@ -13,8 +13,14 @@ const vega = (target: HTMLElement, spec: any) => new Promise((resolve, reject) =
   vegaEmbed.default(container, spec).then(resolve).catch(reject);
 });
 
+interface IOptions {
+  width?: number;
+  height?: number;
+}
+
 class ActivationFunctions {
-  render(target: HTMLElement, fn?: ACTIVATION_FUNCTION) {
+  render(target: HTMLElement, fn?: ACTIVATION_FUNCTION, options: IOptions = {}) {
+    console.log(target, fn, options);
     const fns = fn? [fn] : [
       ACTIVATION_FUNCTION.SIGMOID,
       ACTIVATION_FUNCTION.RELU,
@@ -31,8 +37,8 @@ class ActivationFunctions {
 
       const spec = {
         "$schema": "https://vega.github.io/schema/vega/v4.json",
-        "width": 300,
-        "height": 300,
+        "width": options.width || 300,
+        "height": options.height || 300,
 
         ...buildSpec({
           fn,
@@ -40,6 +46,7 @@ class ActivationFunctions {
           interpolate,
         }),
       };
+      console.log('spec', spec);
       vega(target, spec);
     });
   }

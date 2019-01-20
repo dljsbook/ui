@@ -1,16 +1,20 @@
 {
   "name": "@dljsbook/ui",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "",
   "repository": "https://github.com/dljsbook/UI",
   "main": "dist/index.js",
+  "watch": {
+    "build": "{src}/*.ts"
+  },
   "scripts": {
     "storybook": "start-storybook -p 9001 -c .storybook",
+    "lint": "tslint -p . -t verbose",
     "deploy": "gh-pages -d data",
     "prepublish": "yarn build",
     "clean": "rimraf dist",
-    "build": "rollup -c rollup.config.js",
-    "develop": "rollup -c rollup.config.js --watch",
+    "build": "yarn clean && yarn lint && tsc -p tsconfig.json",
+    "develop": "tsc -p tsconfig.json --watch",
     "test": "jest --watchAll"
   },
   "author": "Kevin Scott <kevin@hitheory.com>",
