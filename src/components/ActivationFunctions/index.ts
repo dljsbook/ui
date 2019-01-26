@@ -20,8 +20,7 @@ interface IOptions {
 
 class ActivationFunctions {
   render(target: HTMLElement, fn?: ACTIVATION_FUNCTION, options: IOptions = {}) {
-    console.log(target, fn, options);
-    const fns = fn? [fn] : [
+    const fns = fn !== undefined ? [fn] : [
       ACTIVATION_FUNCTION.SIGMOID,
       ACTIVATION_FUNCTION.RELU,
       ACTIVATION_FUNCTION.TANH,
@@ -46,7 +45,6 @@ class ActivationFunctions {
           interpolate,
         }),
       };
-      console.log('spec', spec);
       vega(target, spec);
     });
   }
