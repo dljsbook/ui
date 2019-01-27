@@ -1,6 +1,6 @@
 {
   "name": "@dljsbook/ui",
-  "version": "0.7.0",
+  "version": "0.7.13",
   "description": "",
   "repository": "https://github.com/dljsbook/UI",
   "main": "dist/index.js",
