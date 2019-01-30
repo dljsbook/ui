@@ -1,10 +1,10 @@
 import * as React from 'react';
-import styled from 'react-emotion';
+import { css } from 'emotion';
 
 interface IProps {
 }
 
-const Container = styled.div`
+const containerClass = css`
 width: 300px;
 height: 300px;
 background: black;
@@ -14,7 +14,7 @@ border-radius: 5px;
 const Picker:React.SFC<IProps> = ({
 }) => {
   return (
-    <Container>Picker</Container>
+    <div className={containerClass}>Picker</div>
   );
 };
 

@@ -1,5 +1,3 @@
-// import vega from '../../utils/vega';
-// import spec from './spec.vg.json';
 import buildSpec from './buildSpec';
 import { FNS } from './config';
 import { ACTIVATION_FUNCTION } from './types';

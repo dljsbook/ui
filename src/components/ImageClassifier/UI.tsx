@@ -1,21 +1,25 @@
 import * as React from 'react';
-import styled from 'react-emotion';
+import { css } from 'emotion';
 import Category from './Category';
-import Needle from './Needle';
+// import Needle from './Needle';
 
 interface IProps {
   children: JSX.Element;
   rotate: number;
+  handleClick: (category: string) => void;
+  handleMouseDown: (category: string) => void;
+  images: {
+    [index: string]: string[];
+  };
 }
 
-const Container = styled.div`
-display: flex;
-height: 360px;
-padding: 20px;
-flex: 1;
+const containerClass = css`
+  display: flex;
+  padding: 20px;
+  flex: 1;
 `;
 
-const Center = styled.div`
+const centerClass = css`
 display: flex;
 flex-direction: column;
 justify-content: flex-start;
@@ -26,15 +30,28 @@ position: relative;
 const UI:React.SFC<IProps> = ({
   children,
   rotate,
+  handleClick,
+  handleMouseDown,
+  images,
 }) => (
-  <Container>
-    <Category title="One" />
-    <Center>
+  <div className={containerClass}>
+    <Category
+      title="One"
+      handleClick={() => handleClick('one')}
+      handleMouseDown={() => handleMouseDown('one')}
+      images={images['one']}
+    />
+    <div className={centerClass}>
       {children}
-      <Needle rotate={rotate} />
-    </Center>
-    <Category title="Two" />
-  </Container>
+      { /* <Needle rotate={rotate} /> */ }
+    </div>
+    <Category
+      title="Two"
+      handleClick={() => handleClick('two')}
+      handleMouseDown={() => handleMouseDown('two')}
+      images={images['two']}
+    />
+  </div>
 );
 
 export default UI;

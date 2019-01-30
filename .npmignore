@@ -9,3 +9,6 @@ example
 .cache
 .travis.yml
 .rpt2_cache
+stories
+build
+.storybook

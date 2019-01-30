@@ -1,6 +1,6 @@
 import * as React from 'react';
-import styled from 'react-emotion';
-import { colors, lighten } from '../../styles/variables';
+import { css } from 'emotion';
+import { colors, lighten } from './variables';
 
 interface IProps {
   rotate: number;
@@ -10,7 +10,7 @@ const SIZE = 220;
 const PADDING = 10;
 const SLICES = 22;
 
-const Hide = styled.div`
+const hideClass = css`
   overflow: hidden;
   position: absolute;
   top: 0;
@@ -19,7 +19,7 @@ const Hide = styled.div`
   height: 100%;
 `;
 
-const Container = styled.div`
+const containerClass = css`
   height: ${SIZE / 2 + PADDING}px;
   width: 100%;
   position: absolute;
@@ -30,41 +30,26 @@ const Container = styled.div`
   margin-bottom: -20px;
 `;
 
-const Circle = styled.div`
+const circleClass = css`
   position: absolute;
   border: 2px solid #CCC;
-  ${({ size }) => `
-    left: calc(50% - ${size / 2}px);
-    top: calc(100% - ${size / 2}px);
-    height: ${size}px;
-    width: ${size}px;
-    border-radius: ${size}px;
-  `}
   background: white;
   overflow: hidden;
   transform: rotate(-82deg);
 `;
 
 const SECTION_WIDTH = 23;
-const Section = styled.div`
-${({ size, index, color }) => `
+const sectionClass = css`
   width: 0;
   height: 0;
+  position: absolute;
+  top: ${SIZE / 2 - SECTION_WIDTH}px;
   border-top: ${SECTION_WIDTH}px solid transparent;
   border-bottom: ${SECTION_WIDTH}px solid transparent;
-  border-left: ${size}px solid ${color};
-  transform-origin: ${size}px ${SECTION_WIDTH}px;
-  transform: rotate(${index * 360 / SLICES}deg);
-  position: absolute;
-  left: calc(50% - ${size}px);
-  top: ${SIZE / 2 - SECTION_WIDTH}px;
-  // z-index: 2;
-  `}
 `;
 
 const MARKER_PADDING = 5;
-const Marker = styled.div`
-  ${({ size }) => `width: ${size / 2 - MARKER_PADDING}px`};
+const markerClass = css`
   height: 14px;
   position: absolute;
   font-size: 12px;
@@ -73,22 +58,22 @@ const Marker = styled.div`
   right: 0;
   transform-origin: 0% 50%;
   justify-content: flex-start;
-  ${({ marker }) => marker === '' ?`
-    display: none;
-    ` : ``}
+`;
 
-  ${({ index, size }) => index < SLICES / 2 ? `
-    color: ${lighten(colors.categories[0].join(','), -20)};
-    margin-top: 29px;
-    transform: scale(1,1) rotate(-20deg);
-    &:before {
-      content: "—"
-    }
-    &:after {
-      content: "%"
-    }
-  ` : `
-    right: -${size / 2 - MARKER_PADDING}px;
+const firstIndex = css`
+  color: ${lighten(colors.categories[0].join(','), -20)};
+  margin-top: 29px;
+  transform: scale(1,1) rotate(-20deg);
+  &:before {
+    content: "—"
+  }
+  &:after {
+    content: "%"
+  }
+`;
+
+const secondIndex = css`
+    right: -${SIZE / 2 - MARKER_PADDING}px;
     justify-content: flex-end;
     color: ${lighten(colors.categories[1].join(','), -15)};
     margin-top: -10px;
@@ -96,12 +81,11 @@ const Marker = styled.div`
     &:after {
       content: "%—"
     }
-  `}
 `;
 
 const POINTER_SIZE = 6;
 const POINTER_COLOR = '#444';
-const Pointer = styled.div`
+const pointerClass = css`
   position: absolute;
   left: 50%;
   bottom: 0px;
@@ -111,12 +95,9 @@ const Pointer = styled.div`
   border-left: 130px solid ${POINTER_COLOR};
   transform-origin: ${POINTER_SIZE / 2}px 50%;
   transition-duration: 0.1s;
-  ${({ rotate }) => `
-    transform: rotate(${rotate - 90}deg);
-  `}
 `;
 
-const PointerDot = styled.div`
+const pointerDotClass = css`
   position: absolute;
   left: 50%;
   bottom: 0;
@@ -157,27 +138,65 @@ const getMarker = (index: number) => {
 const Needle:React.SFC<IProps> = ({
   rotate,
 }) => (
-  <Container>
-    <Hide>
-      <Circle size={SIZE}>
+  <div className={containerClass}>
+    <div className={hideClass}>
+      <div
+        className={circleClass}
+        style={{
+          left: `calc(50% - ${SIZE/2}px)`,
+          top: `calc(100% - ${SIZE/2}px)`,
+          height: `${SIZE}px`,
+          width: `${SIZE}px`,
+          borderRadius: `${SIZE}px`,
+        }}
+      >
         {Array(SLICES).fill('').map((_, i) => {
         const index = i;
         const mid = SLICES / 2;
         console.log(index, mid);
         return (
-        <Section size={SIZE / 2 + 10} index={index} color={getColor(index, mid)}>
-          <Marker index={index} marker={getMarker(index)} size={SIZE}>
+        <div
+          className={sectionClass}
+          style={{
+            borderLeft: `${SIZE / 2 + 10}px solid ${getColor(index, mid)}`,
+            transformOrigin: `${SIZE / 2 + 10}px ${SECTION_WIDTH}px`,
+            transform: `rotate(${index * 360 / SLICES}deg)`,
+            left: `calc(50% - ${SIZE / 2 + 10}px)`,
+          }}
+        >
+          <div
+            className={`${markerClass} ${index < SLICES / 2 ? firstIndex : secondIndex}`}
+
+            style={{
+              width: `${SIZE / 2 - MARKER_PADDING}px`,
+              display: getMarker(index) === '' ? 'none' : '',
+            }}
+          >
             {getMarker(index)}
-          </Marker>
-        </Section>
+          </div>
+        </div>
         );
         })}
-      </Circle>
-      <Circle size={50} />
-    </Hide>
-    <Pointer rotate={rotate} />
-    <PointerDot />
-  </Container>
+      </div>
+      <div
+        className={circleClass}
+        style={{
+          left: `calc(50% - ${50/2}px)`,
+          top: `calc(100% - ${50/2}px)`,
+          height: `50px`,
+          width: `50px`,
+          borderRadius: `50px`,
+        }}
+      />
+    </div>
+    <div
+      className={pointerClass}
+      style={{
+        transform: `rotate(${rotate - 90}deg)`,
+      }}
+    />
+    <div className={pointerDotClass} />
+  </div>
 );
 
 export default Needle;

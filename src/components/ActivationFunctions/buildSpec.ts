@@ -54,7 +54,7 @@ const Y_RULE = {
 const getSignals = (expr: Expr, x: number, y:number) => ([
   {
     "name": X_NAME,
-    "value": 2,
+    "value": x,
     "on": [
       {
         "events": "mousemove",
@@ -64,7 +64,7 @@ const getSignals = (expr: Expr, x: number, y:number) => ([
   },
   {
     "name": "xval",
-    "value": x,
+    "value": 0,
     "on": [
       {
         "events": "mousemove",
@@ -158,6 +158,7 @@ const SCALES = [
 ];
 
 const getSpec = ({
+  fn,
   interpolate,
   data,
   color,
@@ -169,18 +170,22 @@ const getSpec = ({
     y: number,
   }[],
   color: any,
+  fn: ((x: number) => number);
   expr: (x: string) => string,
-}) => ({
-  data: {
-    name: DATA_NAME,
-    values: data,
-  },
+}) => {
+  const DEFAULT_X = 0;
+  return {
+    data: {
+      name: DATA_NAME,
+      values: data,
+    },
 
-  axes: AXES,
-  signals: getSignals(expr, 0, 0),
-  marks: getMarks(color, interpolate),
-  scales: SCALES,
-});
+    axes: AXES,
+    signals: getSignals(expr, DEFAULT_X, fn(DEFAULT_X)),
+    marks: getMarks(color, interpolate),
+    scales: SCALES,
+  };
+};
 
 const getAtStep = (step: number, num: number, start: number, end: number) => start + ((end - start) * step / (num - 1));
 const getData = (fn: Function, interpolate?: boolean) => {
@@ -207,10 +212,11 @@ const buildSpec = (props: IProps) => {
   } = props;
 
   return getSpec({
+    expr,
+    fn,
     interpolate,
     data: getData(fn, interpolate),
     color: COLORS[0],
-    expr: expr,
   });
 };
 

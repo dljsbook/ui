@@ -1,8 +1,17 @@
 import * as React from 'react';
-import styled from 'react-emotion';
+import * as ReactDOM from 'react-dom';
+import { css } from 'emotion';
 import Button from './Button';
 import UI from './UI';
 import Picker from './Picker';
+import Video from './Video';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import {
+  faUndo,
+  faChevronLeft,
+  faCameraRetro,
+  faImages,
+} from '@fortawesome/free-solid-svg-icons'
 
 interface IProps {
 }
@@ -10,11 +19,21 @@ interface IProps {
 interface IState {
   rotate: number;
   input: string | null;
+  capturing: string | null;
+  images: {
+    [index: string]: string[];
+  };
 }
 
-const Container = styled.div`
+const containerClass = css`
+
+font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+  "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+  sans-serif;
+-webkit-font-smoothing: antialiased;
+-moz-osx-font-smoothing: grayscale;
 overflow: hidden;
-min-height: 440px;
+min-height: 380px;
 background: #f9f9f9;
 box-shadow: 0 3px 2px rgba(0,0,0,0.15);
 border-radius: 5px;
@@ -30,7 +49,7 @@ video {
 }
 `;
 
-const Header = styled.div`
+const headerClass = css`
   height: 25px;
   background: rgba(0,0,0,0.05);
   margin-bottom: 15px;
@@ -39,7 +58,7 @@ const Header = styled.div`
   align-items: center;
   font-size: 13px;
 
-  span {
+  span, svg {
     margin: 0 5px 0 0;
     color: rgba(0,0,0,0.5);
   }
@@ -50,7 +69,7 @@ const Header = styled.div`
   }
 `;
 
-const Chooser = styled.div`
+const chooserClass = css`
 flex: 1;
 display: flex;
 justify-content: center;
@@ -59,7 +78,7 @@ flex-direction: column;
 padding: 20px;
 `;
 
-const Or = styled.div`
+const orClass = css`
   &:after {
     display: block;
     content: "Or";
@@ -67,28 +86,35 @@ const Or = styled.div`
   }
 `;
 
-const Left = styled.div`
+const leftClass = css`
   text-align: left;
   flex: 1;
 `;
 
-const Right = styled.div`
+const rightClass = css`
   text-align: right;
   flex: 1;
 `;
 
-class ImageClassifier extends React.Component<IProps, IState> {
+class ImageClassifierComponent extends React.Component<IProps, IState> {
   state: IState = {
     input: null,
     rotate: 0,
+    capturing: null,
+    images: {},
   };
 
   componentDidMount() {
-    setInterval(() => {
-      this.setState({
-        rotate: parseInt(Math.random() * 180 - 90, 10),
-      });
-    }, 200);
+    window.addEventListener('mouseup', this.handleMouseUp);
+    // setInterval(() => {
+    //   this.setState({
+    //     rotate: parseInt(`${Math.random() * 180 - 90}`, 10),
+    //   });
+    // }, 200);
+  }
+
+  componentWillUnmount = () => {
+    window.removeEventListener('mouseup', this.handleMouseUp);
   }
 
   back = () => this.setState({
@@ -96,63 +122,110 @@ class ImageClassifier extends React.Component<IProps, IState> {
   });
 
   reset = () => this.setState({
-    // input: null,
+    images: {},
   });
 
   setInput = (input: string) => this.setState({
     input,
   })
 
+  handleClick = (category: string) => {
+  }
+
+  handleMouseDown = (category: string) => {
+    this.setState({
+      capturing: category,
+    });
+  }
+
+  handleMouseUp = () => {
+    this.setState({
+      capturing: null,
+    });
+  }
+
+  capture = (pixels: any) => {
+    const {
+      capturing,
+      images,
+    } = this.state;
+
+    if (!capturing) {
+      throw new Error('Capture called without an active category');
+    }
+
+    if (!images[capturing]) {
+      images[capturing] = [];
+    }
+
+    images[capturing].push(pixels);
+
+    this.setState({
+      images,
+    });
+  }
+
   render() {
     if (this.state.input === null) {
       return (
-        <Container>
-          <Header />
-          <Chooser>
+        <div className={containerClass}>
+          <div className={headerClass} />
+          <div className={chooserClass}>
             <p>Choose your input source</p>
             <Button
               handleClick={() => this.setInput('webcam')}
             >
-              <span className='fa fa-camera-retro' />
+              <FontAwesomeIcon icon={faCameraRetro} />
               Webcam
             </Button>
-            <Or />
+            <div className={orClass} />
             <Button
               handleClick={() => this.setInput('images')}
             >
-              <span className='fa fa-images' />
+              <FontAwesomeIcon icon={faImages} />
               Images
             </Button>
-          </Chooser>
-        </Container>
+          </div>
+        </div>
       );
     }
 
     return (
-      <Container>
-        <Header>
-          <Left>
+      <div className={containerClass}>
+        <div className={headerClass}>
+          <div className={leftClass}>
             <a onClick={this.back}>
-              <span className='fa fa-chevron-left' />
+              <FontAwesomeIcon icon={faChevronLeft} />
               Back
             </a>
-          </Left>
-          <Right>
+          </div>
+          <div className={rightClass}>
             <a onClick={this.reset}>
-              <span className='fa fa-undo' />
+              <FontAwesomeIcon icon={faUndo} />
               Reset
             </a>
-          </Right>
-        </Header>
-        <UI rotate={this.state.rotate}>
+          </div>
+        </div>
+        <UI
+          rotate={this.state.rotate}
+          handleClick={this.handleClick}
+          handleMouseDown={this.handleMouseDown}
+          images={this.state.images}
+        >
           {this.state.input === 'webcam' ? (
-            <video />
+            <Video capture={this.state.capturing ? this.capture : undefined} />
           ) : (
             <Picker />
           )}
         </UI>
-      </Container>
+      </div>
     );
+  }
+}
+
+class ImageClassifier {
+  render(target: HTMLElement) {
+    ReactDOM.render(<ImageClassifierComponent />, target);
   }
 }
 
