@@ -63,13 +63,30 @@ interface IParams {
   size?: number;
 }
 
+interface IProps {
+  model?: tf.Model;
+  size?: number;
+}
+
 class MNISTPainter {
   private model:tf.Model;
   private canvas: Canvas;
   private button: HTMLElement;
   private container: HTMLElement;
   private predictions: HTMLElement;
-  // private size: number;
+
+  constructor(target?: HTMLElement, options: IProps = {}) {
+    if (target) {
+      this.render(target, {
+        size: options.size,
+      });
+    }
+
+    if (options.model) {
+      this.setModel(options.model);
+      this.predict();
+    }
+  }
 
   render(target: HTMLElement, {
     size,
