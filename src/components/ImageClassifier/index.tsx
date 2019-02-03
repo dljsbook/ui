@@ -225,6 +225,12 @@ class ImageClassifierComponent extends React.Component<IProps, IState> {
 class ImageClassifier {
   private getImagesReact: () => IImages;
 
+  constructor(target?: HTMLElement) {
+    if (target) {
+      this.render(target);
+    }
+  }
+
   render(target: HTMLElement) {
     const comp = (
       <ImageClassifierComponent

@@ -1,6 +1,6 @@
 {
   "name": "@dljsbook/ui",
-  "version": "0.8.3",
+  "version": "0.8.4",
   "description": "This is a supporting library for the book Deep Learning With Javascript (https://dljsbook.com).",
   "author": "Kevin Scott <kevin@dljsbook.com>",
   "license": "MIT",
