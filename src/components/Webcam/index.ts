@@ -111,7 +111,9 @@ class Webcam {
   }
 
   disconnect = () => {
-    this.stream.getTracks().forEach((track: any) => track.stop());
+    if (this.stream) {
+      (this.stream.getTracks() || []).forEach((track: any) => track.stop());
+    }
     this.video.src = "";
   }
 }
