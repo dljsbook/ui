@@ -2,7 +2,6 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { css } from 'emotion';
 import Button from './Button';
-import UI from './UI';
 import Picker from './Picker';
 import Video from './Video';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -13,7 +12,12 @@ import {
   faImages,
 } from '@fortawesome/free-solid-svg-icons'
 
+interface IImages {
+  [index: string]: string[];
+};
+
 interface IProps {
+  attachGetImages: (callback: () => IImages) => void;
 }
 
 interface IState {
@@ -21,12 +25,221 @@ interface IState {
   input: string | null;
   capturing: string | null;
   images: {
-    [index: string]: string[];
+    webcam: IImages;
+    upload: IImages;
   };
 }
 
-const containerClass = css`
+const processDroppedImage = (file: File): Promise<string> => new Promise((resolve, reject) => {
+  var reader = new FileReader();
 
+  reader.onload = (e: any) => {
+    if (e.target) {
+      return resolve(e.target.result);
+    }
+
+    reject('Could not find result');
+  };
+
+  // read the image file as a data URL.
+  reader.readAsDataURL(file);
+});
+
+const processDroppedImages = (files: File[]): Promise<string[]> => new Promise((resolve, reject) => {
+  Promise.all(files.map(file => processDroppedImage(file))).then(files => {
+    resolve(files);
+  });
+});
+
+class ImageClassifierComponent extends React.Component<IProps, IState> {
+  state: IState = {
+    input: null,
+    rotate: 0,
+    capturing: null,
+    images: {
+      webcam: {},
+      upload: {},
+    },
+  };
+
+  constructor(props: IProps) {
+    super(props);
+
+    props.attachGetImages(this.getImages);
+  }
+
+  getImages = (): IImages => {
+    if (!this.state.capturing) {
+      throw new Error('No capturing mode active');
+    }
+
+    return this.state.images[this.state.capturing];
+  }
+
+  componentDidMount() {
+    window.addEventListener('mouseup', this.handleMouseUp);
+    // setInterval(() => {
+    //   this.setState({
+    //     rotate: parseInt(`${Math.random() * 180 - 90}`, 10),
+    //   });
+    // }, 200);
+  }
+
+  componentWillUnmount = () => {
+    window.removeEventListener('mouseup', this.handleMouseUp);
+  }
+
+  back = () => this.setState({
+    input: null,
+  });
+
+  reset = () => {
+    if (this.state.input) {
+      this.setState({
+        images: {
+          ...this.state.images,
+          [this.state.input]: {},
+        },
+      });
+    }
+  }
+
+  setInput = (input: string) => this.setState({
+    input,
+  })
+
+  handleClick = (category: string) => {
+  }
+
+  handleMouseDown = (category: string) => {
+    this.setState({
+      capturing: category,
+    });
+  }
+
+  handleMouseUp = () => {
+    this.setState({
+      capturing: null,
+    });
+  }
+
+  capture = (pixels: string) => {
+    if (!this.state.capturing) {
+      throw new Error('Capture called without an active category');
+    }
+    if (!this.state.input) {
+      throw new Error('No input set');
+    }
+
+    this.updateImages('webcam', this.state.capturing, [pixels]);
+  }
+
+  updateImages = (mode: string, category: string, images: string[]) => {
+    const payload = {
+      images: {
+        ...this.state.images,
+        [mode]: {
+        ...this.state.images[mode],
+          [category]: [
+            ...(this.state.images[mode][category] || []),
+            ...images,
+          ],
+        }
+      },
+    };
+
+    this.setState({
+      ...this.state,
+      ...payload,
+    });
+  }
+
+  onDrop = async (category: string, files: File[]) => {
+    const processedImages = await processDroppedImages(files);
+    this.updateImages('upload', category, processedImages);
+  }
+
+  render() {
+    if (this.state.input === null) {
+      return (
+        <div className={containerClass}>
+          <div className={headerClass} />
+          <div className={chooserClass}>
+            <p>Choose your input source</p>
+            <Button
+              handleClick={() => this.setInput('webcam')}
+            >
+              <FontAwesomeIcon icon={faCameraRetro} />
+              Webcam
+            </Button>
+            <div className={orClass} />
+            <Button
+              handleClick={() => this.setInput('upload')}
+            >
+              <FontAwesomeIcon icon={faImages} />
+              Upload
+            </Button>
+          </div>
+        </div>
+      );
+    }
+
+    const images = this.state.images[this.state.input];
+
+    return (
+      <div className={containerClass}>
+        <div className={headerClass}>
+          <div className={leftClass}>
+            <a onClick={this.back}>
+              <FontAwesomeIcon icon={faChevronLeft} />
+              Back
+            </a>
+          </div>
+          <div className={rightClass}>
+            <a onClick={this.reset}>
+              <FontAwesomeIcon icon={faUndo} />
+              Reset
+            </a>
+          </div>
+        </div>
+        {this.state.input === 'webcam' ? (
+          <Video
+            capture={this.state.capturing ? this.capture : undefined}
+            handleClick={this.handleClick}
+            handleMouseDown={this.handleMouseDown}
+            images={images}
+          />
+        ) : (
+          <Picker
+            onDrop={this.onDrop}
+            handleClick={this.handleClick}
+            handleMouseDown={this.handleMouseDown}
+            images={images}
+          />
+        )}
+      </div>
+    );
+  }
+}
+
+class ImageClassifier {
+  private getImagesReact: () => IImages;
+
+  render(target: HTMLElement) {
+    const comp = (
+      <ImageClassifierComponent
+        attachGetImages={(callback) => {
+          this.getImagesReact = callback;
+        }}
+      />
+    );
+    ReactDOM.render(comp, target);
+  }
+
+  getImages = () => this.getImagesReact();
+}
+
+const containerClass = css`
 font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
   "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
   sans-serif;
@@ -79,6 +292,7 @@ padding: 20px;
 `;
 
 const orClass = css`
+  margin: 5px 0;
   &:after {
     display: block;
     content: "Or";
@@ -95,138 +309,5 @@ const rightClass = css`
   text-align: right;
   flex: 1;
 `;
-
-class ImageClassifierComponent extends React.Component<IProps, IState> {
-  state: IState = {
-    input: null,
-    rotate: 0,
-    capturing: null,
-    images: {},
-  };
-
-  componentDidMount() {
-    window.addEventListener('mouseup', this.handleMouseUp);
-    // setInterval(() => {
-    //   this.setState({
-    //     rotate: parseInt(`${Math.random() * 180 - 90}`, 10),
-    //   });
-    // }, 200);
-  }
-
-  componentWillUnmount = () => {
-    window.removeEventListener('mouseup', this.handleMouseUp);
-  }
-
-  back = () => this.setState({
-    input: null,
-  });
-
-  reset = () => this.setState({
-    images: {},
-  });
-
-  setInput = (input: string) => this.setState({
-    input,
-  })
-
-  handleClick = (category: string) => {
-  }
-
-  handleMouseDown = (category: string) => {
-    this.setState({
-      capturing: category,
-    });
-  }
-
-  handleMouseUp = () => {
-    this.setState({
-      capturing: null,
-    });
-  }
-
-  capture = (pixels: any) => {
-    const {
-      capturing,
-      images,
-    } = this.state;
-
-    if (!capturing) {
-      throw new Error('Capture called without an active category');
-    }
-
-    if (!images[capturing]) {
-      images[capturing] = [];
-    }
-
-    images[capturing].push(pixels);
-
-    this.setState({
-      images,
-    });
-  }
-
-  render() {
-    if (this.state.input === null) {
-      return (
-        <div className={containerClass}>
-          <div className={headerClass} />
-          <div className={chooserClass}>
-            <p>Choose your input source</p>
-            <Button
-              handleClick={() => this.setInput('webcam')}
-            >
-              <FontAwesomeIcon icon={faCameraRetro} />
-              Webcam
-            </Button>
-            <div className={orClass} />
-            <Button
-              handleClick={() => this.setInput('images')}
-            >
-              <FontAwesomeIcon icon={faImages} />
-              Images
-            </Button>
-          </div>
-        </div>
-      );
-    }
-
-    return (
-      <div className={containerClass}>
-        <div className={headerClass}>
-          <div className={leftClass}>
-            <a onClick={this.back}>
-              <FontAwesomeIcon icon={faChevronLeft} />
-              Back
-            </a>
-          </div>
-          <div className={rightClass}>
-            <a onClick={this.reset}>
-              <FontAwesomeIcon icon={faUndo} />
-              Reset
-            </a>
-          </div>
-        </div>
-        <UI
-          rotate={this.state.rotate}
-          handleClick={this.handleClick}
-          handleMouseDown={this.handleMouseDown}
-          images={this.state.images}
-        >
-          {this.state.input === 'webcam' ? (
-            <Video capture={this.state.capturing ? this.capture : undefined} />
-          ) : (
-            <Picker />
-          )}
-        </UI>
-      </div>
-    );
-  }
-}
-
-class ImageClassifier {
-  render(target: HTMLElement) {
-    ReactDOM.render(<ImageClassifierComponent />, target);
-  }
-}
 
 export default ImageClassifier;

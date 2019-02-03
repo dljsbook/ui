@@ -11,6 +11,7 @@ interface IProps {
 
 const cssButtonClass = css`
   color: white;
+  -webkit-user-select: none;
   border: none;
   border-radius: 5px;
   padding: 10px 30px;
@@ -26,25 +27,25 @@ const cssButtonClass = css`
 
 const blue = colors.categories[0].join(',');
 const blueButtonClass = css`
-  background: linear-gradient(${lighten(blue, 15)}, ${lighten(blue, 0)});
+  background: linear-gradient(${lighten(blue, 20)}, ${lighten(blue, 0)});
   &:hover {
-    background: linear-gradient(${lighten(blue, 10)}, ${lighten(blue, -5)});
+    background: linear-gradient(${lighten(blue, 15)}, ${lighten(blue, -5)});
   }
 
   &:active {
-    background: linear-gradient(${lighten(blue, 10)}, ${lighten(blue, -10)});
+    background: linear-gradient(${lighten(blue, 10)}, ${lighten(blue, -15)});
   }
 `;
 
 const orange = colors.categories[1].join(',');
 const orangeButtonClass = css`
-  background: linear-gradient(${lighten(orange, 15)}, ${lighten(orange, 0)});
+  background: linear-gradient(${lighten(orange, 20)}, ${lighten(orange, 0)});
   &:hover {
-    background: linear-gradient(${lighten(orange, 10)}, ${lighten(orange, -5)});
+    background: linear-gradient(${lighten(orange, 15)}, ${lighten(orange, -5)});
   }
 
   &:active {
-    background: linear-gradient(${lighten(orange, 10)}, ${lighten(orange, -10)});
+    background: linear-gradient(${lighten(orange, 10)}, ${lighten(orange, -15)});
   }
 `;
 

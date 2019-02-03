@@ -1,0 +1,102 @@
+import rough from 'roughjs/bin/wrappers/rough';
+import scale from '../../../utils/scale';
+
+export type IPoint = {
+  x: number;
+  y: number;
+}
+
+export type IChartSize = {
+  width: number;
+  height: number;
+};
+
+const getMinAndMax = (points: Array<number>): [number, number] => {
+  if (!points.length) {
+    throw new Error('You must provide points');
+  }
+
+  let min: null | number = null;
+  let max: null | number = null;
+
+  for (let i = 0; i < points.length; i++) {
+    const point = points[i];
+    min = (min !== null && min < point) ? min : point;
+    max = (max !== null && max > point) ? max : point;
+  }
+
+  if (min === null || max === null) {
+    throw new Error('There was an error setting the points');
+  }
+
+  return [
+    min,
+    max,
+  ];
+}
+
+const drawChart = (target: HTMLElement, points: Array<IPoint>, options: any = {}) => {
+  const canvas = document.createElement('canvas');
+  const canvasSize = {
+    width: options.width || 300,
+    height: options.height || 300,
+  };
+  canvas.width = canvasSize.width;
+  canvas.height = canvasSize.height;
+  target.appendChild(canvas);
+
+  const chartSize = {
+    width: canvasSize.width,
+    height: canvasSize.height,
+  };
+
+  drawAxis(canvas, 10, chartSize);
+  drawAxis(canvas, 10, chartSize, true);
+  drawLine(canvas, points, height, width);
+};
+
+const drawLine = (canvas: HTMLCanvasElement, points: Array<IPoint>, height: number, width: number) => {
+  const rc = rough.canvas(canvas);
+
+  const rcPoints: Array<[number, number]> = []
+  for (let i = 0; i < points.length; i++) {
+    const point = points[i];
+    rcPoints.push([
+      scale(point.x, getMinAndMax(points.map(point => point.x)), [0, width]),
+      scale(point.y, getMinAndMax(points.map(point => point.y)), [height - 20, 0]),
+    ]);
+  }
+
+  rc.curve(rcPoints, {
+    roughness: 0.0,
+    stroke: 'black',
+    strokeWidth: 3,
+  });
+}
+
+const drawAxis = (canvas: HTMLCanvasElement, ticks: number, length: number, size: number, vertical?: boolean) => {
+  const ctx = canvas.getContext('2d');
+  if (!ctx) {
+    throw new Error('Context could not be found');
+  }
+  const rc = rough.canvas(canvas);
+  for (let i = 0; i < ticks; i++) {
+    const tick = (i * size / (ticks - 1));
+
+    let args = [tick, 0, tick, length];
+    if (vertical) {
+      args = [0, tick, length, tick];
+    }
+    const fontSize = 12;
+    ctx.font = `${fontSize}px`;
+    ctx.fillText(`${tick}`, tick, length - fontSize);
+    rc.line(args[0], args[1], args[2], args[3], {
+      roughness: 0.0,
+      stroke: 'rgba(0,0,0,0.1)',
+      strokeWidth: 0.8,
+    });
+  }
+}
+
+
+export default drawChart;
