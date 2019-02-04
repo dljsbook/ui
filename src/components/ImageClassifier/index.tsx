@@ -70,12 +70,11 @@ class ImageClassifierComponent extends React.Component<IProps, IState> {
   }
 
   getImages = (): IImages => {
-    console.log(this)
-    if (!this.state.capturing) {
-      throw new Error('No capturing mode active');
+    if (!this.state.input) {
+      throw new Error('No input mode active');
     }
 
-    return this.state.images[this.state.capturing];
+    return this.state.images[this.state.input];
   }
 
   handleImages = (e: React.MouseEvent) => {
