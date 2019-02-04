@@ -16,11 +16,6 @@ padding: 0 20px;
 
 &:last-child {
   padding-right: 0;
-  h2 {
-    span {
-      text-align: right;
-    }
-  }
 }
 `;
 
@@ -57,10 +52,7 @@ const headerClass = css`
 
       span {
         flex: 1;
-        text-align: left;
       }
-
-
     }
   }
 
@@ -86,6 +78,9 @@ const orangeHeader = css`
 
   h2 {
     flex-direction: row-reverse;
+    span {
+      text-align: right;
+    }
   }
 `;
 
@@ -97,7 +92,14 @@ interface IProps {
   buttonText?: string | JSX.Element;
   divider: boolean;
   children?: boolean | JSX.Element | JSX.Element[];
+  index: number;
 }
+
+const getHeaderClass = (index: number, divider?: boolean) => `
+${headerClass}
+${divider ? dividerClass : ''}
+${index === 1 ? orangeHeader : ''}
+`;
 
 const Category:React.SFC<IProps> = ({
   title,
@@ -107,11 +109,11 @@ const Category:React.SFC<IProps> = ({
   buttonText,
   divider,
   children,
+  index,
 }) => {
-  const index = title === 'One' ? 0 : 1;
   return (
     <div className={containerClass}>
-      <div className={`${headerClass} ${divider ? dividerClass : ''} ${index === 1 ? orangeHeader : ''}`}>
+      <div className={getHeaderClass(index, divider)}>
         <h2
           style={{
             color: `${lighten(colors.categories[index].join(','), 0)}`,

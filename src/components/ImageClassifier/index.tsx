@@ -252,7 +252,11 @@ class ImageClassifier {
         attachGetImages={(callback) => {
           this.getImagesReact = callback;
         }}
-        handleImages={this.handleImages}
+        handleImages={(images: IImages) => {
+          if (this.onImagesCallback) {
+            this.onImagesCallback(images);
+          }
+        }}
       />
     );
     ReactDOM.render(comp, target);
@@ -262,12 +266,6 @@ class ImageClassifier {
 
   onImages = (callback: IOnImagesCallback) => {
     this.onImagesCallback = callback;
-  }
-
-  handleImages = (images: IImages) => {
-    if (this.onImagesCallback) {
-      this.onImagesCallback(images);
-    }
   }
 }
 

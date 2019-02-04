@@ -175,6 +175,7 @@ const WrappedCategory: React.SFC<IWrappedCategoryProps> = ({
             handleMouseDown={() => handleMouseDown(category)}
             images={i}
             divider={imagesArePresent}
+            index={categoryIndex}
             buttonText={(
               <React.Fragment>
                 <FontAwesomeIcon icon={faUpload} />

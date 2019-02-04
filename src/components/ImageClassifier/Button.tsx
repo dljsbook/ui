@@ -45,12 +45,12 @@ const blueButtonClass = css`${makeButtonClass(colors.categories[0])} `;
 
 const orangeButtonClass = css`${makeButtonClass(colors.categories[1])}`;
 
+const gray = colors.gray.join(',');
 const disabledClass = css`
   cursor: default;
-  ${makeButtonClass(colors.gray)}
-
+  background: linear-gradient(${lighten(gray, 20)}, ${lighten(gray, 0)});
   &:hover, &:active {
-    background: inherit;
+    background: linear-gradient(${lighten(gray, 20)}, ${lighten(gray, 0)});
   }
 `;
 

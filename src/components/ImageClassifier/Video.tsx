@@ -136,6 +136,7 @@ class Video extends React.Component<IProps, IState> {
           images={images['one']}
           buttonText={'Capture'}
           divider={true}
+          index={0}
         >
           {(!images['one'] || images['one'].length === 0) && placeholder}
         </Category>
@@ -149,6 +150,7 @@ class Video extends React.Component<IProps, IState> {
           images={images['two']}
           buttonText={'Capture'}
           divider={true}
+          index={1}
         >
           {(!images['two'] || images['two'].length === 0) && placeholder}
       </Category>
