@@ -52,7 +52,7 @@ class Webcam {
   private disabled: HTMLDivElement;
   private resolved: boolean = false;
   private video: HTMLVideoElement;
-  private stream: any;
+  private stream?: any;
   private width:number;
   private height:number;
 

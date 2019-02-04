@@ -18,6 +18,7 @@ interface IImages {
 
 interface IProps {
   attachGetImages: (callback: () => IImages) => void;
+  handleImages: (images: IImages) => void;
 }
 
 interface IState {
@@ -65,15 +66,20 @@ class ImageClassifierComponent extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props);
 
-    props.attachGetImages(this.getImages);
+    props.attachGetImages(this.getImages.bind(this));
   }
 
   getImages = (): IImages => {
+    console.log(this)
     if (!this.state.capturing) {
       throw new Error('No capturing mode active');
     }
 
     return this.state.images[this.state.capturing];
+  }
+
+  handleImages = (e: React.MouseEvent) => {
+    this.props.handleImages(this.getImages());
   }
 
   componentDidMount() {
@@ -186,6 +192,10 @@ class ImageClassifierComponent extends React.Component<IProps, IState> {
 
     const images = this.state.images[this.state.input];
 
+    const disabled = Object.values(images).reduce((present: number, category: string[]) => {
+      return present + (category.length > 0 ? 1 : 0);
+    }, 0) < 2;
+
     return (
       <div className={containerClass}>
         <div className={headerClass}>
@@ -217,13 +227,19 @@ class ImageClassifierComponent extends React.Component<IProps, IState> {
             images={images}
           />
         )}
+        <div className={handleImagesClass}>
+          <Button action={true} disabled={disabled} handleClick={this.handleImages}>Get images</Button>
+        </div>
       </div>
     );
   }
 }
 
+type IOnImagesCallback = (images: IImages) => void;
+
 class ImageClassifier {
   private getImagesReact: () => IImages;
+  private onImagesCallback: IOnImagesCallback;
 
   constructor(target?: HTMLElement) {
     if (target) {
@@ -237,13 +253,31 @@ class ImageClassifier {
         attachGetImages={(callback) => {
           this.getImagesReact = callback;
         }}
+        handleImages={this.handleImages}
       />
     );
     ReactDOM.render(comp, target);
   }
 
   getImages = () => this.getImagesReact();
+
+  onImages = (callback: IOnImagesCallback) => {
+    this.onImagesCallback = callback;
+  }
+
+  handleImages = (images: IImages) => {
+    if (this.onImagesCallback) {
+      this.onImagesCallback(images);
+    }
+  }
 }
+
+const handleImagesClass = css`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 10px;
+`;
 
 const containerClass = css`
 font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",

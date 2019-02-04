@@ -7,6 +7,8 @@ interface IProps {
   handleMouseDown?: (e: React.MouseEvent<HTMLDivElement>) => void;
   children: JSX.Element | string | (JSX.Element | string | boolean | null)[];
   index?: number;
+  disabled?: boolean;
+  action?: boolean;
 }
 
 const cssButtonClass = css`
@@ -25,40 +27,64 @@ const cssButtonClass = css`
   }
 `;
 
-const blue = colors.categories[0].join(',');
-const blueButtonClass = css`
-  background: linear-gradient(${lighten(blue, 20)}, ${lighten(blue, 0)});
+const makeButtonClass = (hsl: number[]) => {
+  const color = hsl.join(',');
+return `
+  background: linear-gradient(${lighten(color, 20)}, ${lighten(color, 0)});
   &:hover {
-    background: linear-gradient(${lighten(blue, 15)}, ${lighten(blue, -5)});
+    background: linear-gradient(${lighten(color, 15)}, ${lighten(color, -5)});
   }
 
   &:active {
-    background: linear-gradient(${lighten(blue, 10)}, ${lighten(blue, -15)});
+    background: linear-gradient(${lighten(color, 10)}, ${lighten(color, -15)});
+  }
+`;
+}
+
+const blueButtonClass = css`${makeButtonClass(colors.categories[0])} `;
+
+const orangeButtonClass = css`${makeButtonClass(colors.categories[1])}`;
+
+const disabledClass = css`
+  cursor: default;
+  ${makeButtonClass(colors.gray)}
+
+  &:hover, &:active {
+    background: inherit;
   }
 `;
 
-const orange = colors.categories[1].join(',');
-const orangeButtonClass = css`
-  background: linear-gradient(${lighten(orange, 20)}, ${lighten(orange, 0)});
-  &:hover {
-    background: linear-gradient(${lighten(orange, 15)}, ${lighten(orange, -5)});
+const actionClass = css`
+  ${makeButtonClass(colors.action)}
+`;
+
+const getButtonClass = (disabled?: boolean, action?: boolean, index?: number) => {
+  if (disabled) {
+    return disabledClass;
   }
 
-  &:active {
-    background: linear-gradient(${lighten(orange, 10)}, ${lighten(orange, -15)});
+  if (action) {
+    return actionClass;
   }
-`;
+
+  return!index ? blueButtonClass : orangeButtonClass;
+}
 
 const Button:React.SFC<IProps> = ({
   children,
   handleClick,
   handleMouseDown,
   index,
+  disabled,
+  action,
 }) => (
   <div
-    className={`${cssButtonClass} ${!index ? blueButtonClass : orangeButtonClass}`}
-    onClick={handleClick}
-    onMouseDown={handleMouseDown}
+    className={`
+    ${cssButtonClass}
+    ${getButtonClass(disabled, action, index)}
+    `}
+    onClick={!disabled ? handleClick : undefined}
+    onMouseDown={!disabled ? handleMouseDown : undefined}
   >
     {children}
   </div>
