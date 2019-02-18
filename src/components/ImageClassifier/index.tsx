@@ -11,11 +11,9 @@ import {
   faCameraRetro,
   faImages,
   faArrowCircleDown,
-  faGraduationCap,
+  // faGraduationCap,
   IconDefinition,
 } from '@fortawesome/free-solid-svg-icons'
-
-console.log('faGraduationCap', faGraduationCap);
 
 interface IImages {
   [index: string]: string[];
