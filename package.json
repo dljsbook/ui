@@ -1,13 +1,12 @@
 {
   "name": "@dljsbook/ui",
-  "version": "0.8.8",
+  "version": "0.10.0",
   "description": "This is a supporting library for the book Deep Learning With Javascript (https://dljsbook.com).",
   "author": "Kevin Scott <kevin@dljsbook.com>",
   "license": "MIT",
   "repository": "https://github.com/dljsbook/ui",
   "module": "dist/index.js",
   "main": "dist/index.js",
-  "browser": "dist/dljsUI.umd.min.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "build:typescript": "tsc -p tsconfig.json",

@@ -10,6 +10,7 @@ import {
   faChevronLeft,
   faCameraRetro,
   faImages,
+  faArrowCircleDown,
 } from '@fortawesome/free-solid-svg-icons'
 
 interface IImages {
@@ -227,7 +228,14 @@ class ImageClassifierComponent extends React.Component<IProps, IState> {
           />
         )}
         <div className={handleImagesClass}>
-          <Button action={true} disabled={disabled} handleClick={this.handleImages}>Get images</Button>
+          <Button
+            action={true}
+            disabled={disabled}
+            handleClick={this.handleImages}
+          >
+            <FontAwesomeIcon icon={faArrowCircleDown} />
+            Get images
+          </Button>
         </div>
       </div>
     );
