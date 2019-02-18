@@ -1,25 +1,26 @@
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import Button from '../src/components/Button';
+// import * as React from 'react';
+// import * as ReactDOM from 'react-dom';
+// import Button from '../src/components/Button';
 import ActivationFunctions from '../src/components/ActivationFunctions';
 import MNISTPainter from '../src/components/MNISTPainter';
+import classifier from './classifier';
 import ImageClassifier from '../src/components/ImageClassifier';
 
-const noop = () => {};
+// const noop = () => {};
 
-const btn = (
-  <Button handleClick={noop}>foo</Button>
-);
+// const btn = (
+//   <Button handleClick={noop}>foo</Button>
+// );
 
 const components: {
   label: string;
   component: (target: HTMLElement) => void;
 }[] = [{
-  label: 'Button',
-  component: (target: HTMLElement) => {
-    ReactDOM.render(btn, target);
-  },
-}, {
+  // label: 'Button',
+  // component: (target: HTMLElement) => {
+  //   ReactDOM.render(btn, target);
+  // },
+// }, {
   label: 'Activation Functions',
   component: (target) => {
     const afns = new ActivationFunctions();
@@ -37,6 +38,6 @@ const components: {
     const imageClassifier = new ImageClassifier();
     imageClassifier.render(target);
   },
-}];
+}, classifier];
 
 export default components;

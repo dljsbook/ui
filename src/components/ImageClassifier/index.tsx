@@ -11,15 +11,26 @@ import {
   faCameraRetro,
   faImages,
   faArrowCircleDown,
+  faGraduationCap,
+  IconDefinition,
 } from '@fortawesome/free-solid-svg-icons'
+
+console.log('faGraduationCap', faGraduationCap);
 
 interface IImages {
   [index: string]: string[];
 };
 
+interface IOptions {
+  actionButtonText?: string;
+  actionButtonIcon?: IconDefinition;
+  onImages?: (images: IImages) => void;
+}
+
 interface IProps {
   attachGetImages: (callback: () => IImages) => void;
   handleImages: (images: IImages) => void;
+  options: IOptions;
 }
 
 interface IState {
@@ -233,8 +244,8 @@ class ImageClassifierComponent extends React.Component<IProps, IState> {
             disabled={disabled}
             handleClick={this.handleImages}
           >
-            <FontAwesomeIcon icon={faArrowCircleDown} />
-            Get images
+            <FontAwesomeIcon icon={this.props.options.actionButtonIcon || faArrowCircleDown} />
+            {this.props.options.actionButtonText || 'Get Images'}
           </Button>
         </div>
       </div>
@@ -247,8 +258,15 @@ type IOnImagesCallback = (images: IImages) => void;
 class ImageClassifier {
   private getImagesReact: () => IImages;
   private onImagesCallback: IOnImagesCallback;
+  private options: IOptions;
 
-  constructor(target?: HTMLElement) {
+  constructor(target?: HTMLElement, options: IOptions = {}) {
+    this.options = options;
+
+    if (this.options.onImages) {
+      this.onImagesCallback = this.options.onImages;
+    }
+
     if (target) {
       this.render(target);
     }
@@ -265,6 +283,7 @@ class ImageClassifier {
             this.onImagesCallback(images);
           }
         }}
+        options={this.options}
       />
     );
     ReactDOM.render(comp, target);
